@@ -20,7 +20,7 @@ public class FormServiceImpl implements iFormService {
     public ResponseEntity<ResponseRest> submitForm(String affair, String body) {
         ResponseRest respuesta = new ResponseRest();
         if (!body.isBlank()) {
-            int ret = emailService.enviarMail("nl.loragro@gmail.com", affair, body);
+            int ret = emailService.enviarMail(affair, body);
 
             if (ret == 200) {
                 respuesta.setMetadata("Respuesta ok", "00", "Cliente encontrado");
@@ -39,7 +39,7 @@ public class FormServiceImpl implements iFormService {
     public ResponseEntity<ResponseRest> submitForm(String affair, String body, MultipartFile file) {
         ResponseRest respuesta = new ResponseRest();
         if (!body.isBlank()) {
-            int ret = emailService.enviarMail("nl.loragro@gmail.com", affair, body, file);
+            int ret = emailService.enviarMail("oportunidad@ultrafibra.com.ar", affair, body, file);
 
             if (ret == 200) {
                 respuesta.setMetadata("Respuesta ok", "00", "Archvivo enviado correctamente");

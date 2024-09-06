@@ -19,40 +19,44 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class EmailServiceImpl {
 
-    private Properties PROP;
-    private String SENDER;
-    private String PASSWORD;
+    private Properties prop;
+    private String remitente;
+    private String password;
     private MimeMessage mCorreo;
-    private Session M_SESSION;
+    private Session mSession;
+    private String email;
 
     public EmailServiceImpl() {
-        PROP = new Properties();
+        prop = new Properties();
 
-        this.SENDER = "alertas.ups.ultrafibra@gmail.com";
-        this.PASSWORD = "spgsodpzqyxfqjxh";
+        this.remitente = "catchall@ultrafibra.com.ar";
+        this.password = "I5/wE*a6wA";
+        this.email = "contacto@ultrafibra.com.ar";
+        prop.put("mail.smtp.host", "vps-2838525-x.dattaweb.com");
+        prop.put("mail.smtp.ssl.trust", "vps-2838525-x.dattaweb.com");
+        prop.put("mail.smtp.port", "465");
+        prop.put("mail.smtp.auth", "true");
+        prop.put("mail.smtp.socketFactory.port", "465");
+        prop.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        prop.put("mail.smtp.socketFactory.fallback", "false");
 
-        PROP.put("mail.smtp.host", "smtp.gmail.com");
-        PROP.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        PROP.setProperty("mail.smtp.starttls.enable", "true");
-        PROP.setProperty("mail.smtp.port", "587");
-        PROP.setProperty("mail.smtp.user", this.SENDER);
-        PROP.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
-        PROP.setProperty("mail.smtp.auth", "true");
-
-        this.M_SESSION = Session.getDefaultInstance(PROP);
+        this.mSession = Session.getInstance(prop, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(remitente, password);
+            }
+        });
     }
 
-    public int enviarMail(String email, String asunto, String mensaje) {
-
+    public int enviarMail(String asunto, String mensaje) {
         try {
-            mCorreo = new MimeMessage(M_SESSION);
-            mCorreo.setFrom(new InternetAddress("nl.loragro@gmail.com"));
-            mCorreo.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            mCorreo = new MimeMessage(mSession);
+            mCorreo.setFrom(new InternetAddress("contacto@ultrafibra.com.ar"));
+            mCorreo.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             mCorreo.setSubject(asunto);
             mCorreo.setText(mensaje, "ISO-8859-1", "html");
 
-            Transport mTransport = M_SESSION.getTransport("smtp");
-            mTransport.connect(this.SENDER, this.PASSWORD);
+            Transport mTransport = mSession.getTransport("smtp");
+            mTransport.connect(this.remitente, this.password);
             mTransport.sendMessage(mCorreo, mCorreo.getRecipients(Message.RecipientType.TO));
             mTransport.close();
 
@@ -69,9 +73,9 @@ public class EmailServiceImpl {
     public int enviarMail(String email, String asunto, String mensaje, MultipartFile multipartFile) {
         try {
             // Crear el mensaje de correo
-            mCorreo = new MimeMessage(M_SESSION);
-            mCorreo.setFrom(new InternetAddress(this.SENDER));
-            mCorreo.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            mCorreo = new MimeMessage(mSession);
+            mCorreo.setFrom(new InternetAddress(this.remitente));
+            mCorreo.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             mCorreo.setSubject(asunto);
 
             // Crear el cuerpo del mensaje
@@ -92,8 +96,8 @@ public class EmailServiceImpl {
             mCorreo.setContent(multipart);
 
             // Enviar el mensaje
-            Transport mTransport = M_SESSION.getTransport("smtp");
-            mTransport.connect(this.SENDER, this.PASSWORD);
+            Transport mTransport = mSession.getTransport("smtp");
+            mTransport.connect(this.remitente, this.password);
             mTransport.sendMessage(mCorreo, mCorreo.getRecipients(Message.RecipientType.TO));
             mTransport.close();
 

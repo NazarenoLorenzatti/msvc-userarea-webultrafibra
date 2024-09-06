@@ -35,6 +35,7 @@ public class ServiceOrderServiceImpl extends CreatePassword implements iServiceO
 
     private List<ServiceOrder> getResponse(String filter, int value) {
         List<ServiceOrder> serviceOrders = new ArrayList();
+         Gson gson = new Gson();
         try {
             Unirest.setTimeouts(0, 0);
             HttpResponse<JsonNode> response = Unirest.post("https://api.gestionreal.com.ar/")
@@ -42,19 +43,15 @@ public class ServiceOrderServiceImpl extends CreatePassword implements iServiceO
                     .basicAuth(this.username, this.createPassword())
                     .body("{\r\n\"action\": \"ordenesdeservicio\",\r\n\"" + filter + "\": " + value + "\r\n}\r\n")
                     .asJson();
-            if (!response.getBody().getObject().get("msg").equals("No se encontraron ordenes de servicio con los parametros de busqueda seleccionados")) {
-                Gson gson = new Gson();
-                JsonObject jsonObject = gson.fromJson(response.getBody().toString(), JsonObject.class);
+             JsonObject jsonObject = gson.fromJson(response.getBody().toString(), JsonObject.class);
+            if (!jsonObject.has("msg")) {
                 Map<String, JsonElement> map = jsonObject.asMap();
-
                 for (Map.Entry<String, JsonElement> entry : map.entrySet()) {
                     ServiceOrder serviceOrder = gson.fromJson(entry.getValue(), ServiceOrder.class);
                     serviceOrder.setId(entry.getKey());
                     serviceOrders.add(serviceOrder);
                 }
-
             }
-
             return serviceOrders;
 
         } catch (UnirestException ex) {

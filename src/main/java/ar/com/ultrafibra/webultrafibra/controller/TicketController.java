@@ -18,7 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = {
-    "*"})
+    "http://localhost:4200",
+    "http://localhost:8002",
+    "https://119.8.72.246",
+    "https://ultrafibra.com.ar",
+    "https://ultrafibra.com.ar:8002",
+"*"})
 @RequestMapping("/api/gr")
 public class TicketController {
 

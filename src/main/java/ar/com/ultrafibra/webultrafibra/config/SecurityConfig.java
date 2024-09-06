@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -25,7 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request -> request
-                .requestMatchers("/api/gr/signin", "/api/gr/form/**", "/api/gr/tests").permitAll())
+                .requestMatchers("/api/gr/signin","/api/gr/test", "/api/gr/form/**", "/api/gr/tests", "/api/gr/signup", "/api/gr/confirm/**", "/api/gr/forward-email/**", "/api/gr/forward-email-dni/**", "/api/gr/recovery-password/**").permitAll())
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2
@@ -37,5 +38,5 @@ public class SecurityConfig {
         
         return http.build();
     }
-    
+        
 }

@@ -14,6 +14,4 @@ public class ApplicationConfig {
         return new MappingJackson2HttpMessageConverter();
     }
 
-    
-
 }

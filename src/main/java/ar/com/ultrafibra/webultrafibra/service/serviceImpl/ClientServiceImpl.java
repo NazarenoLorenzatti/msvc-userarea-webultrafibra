@@ -15,26 +15,31 @@ import java.util.Map;
 
 @Service
 public class ClientServiceImpl extends CreatePassword implements iClientService {
-    
+
     @Override
     public Client findByDocumentNumber(String number) {
         HttpResponse<JsonNode> response = getResponse(number);
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response.getBody().toString(), JsonObject.class);
-        JsonElement clientJson = jsonObject.get("clientes");
+        if (response != null) {
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(response.getBody().toString(), JsonObject.class);
+            JsonElement clientJson = jsonObject.get("clientes");
 
-        if (clientJson.isJsonArray()) {
-            Type clienteListType = new TypeToken<List<Client>>() {
-            }.getType();
-            List<Client> clientes = gson.fromJson(clientJson.getAsJsonArray(), clienteListType);
+            if (clientJson.isJsonArray()) {
+                Type clienteListType = new TypeToken<List<Client>>() {
+                }.getType();
+                List<Client> clientes = gson.fromJson(clientJson.getAsJsonArray(), clienteListType);
 
-            if (!clientes.isEmpty()) {
-                return clientes.get(0);
+                if (!clientes.isEmpty()) {
+                    return clientes.get(0);
+                } else {
+                    return null;
+                }
             } else {
+                System.err.println("El JSON no contiene un array de clientes");
                 return null;
             }
         } else {
-            System.err.println("El JSON no contiene un array de clientes");
+            System.err.println("No se encontro el DNI");
             return null;
         }
 
@@ -48,12 +53,12 @@ public class ClientServiceImpl extends CreatePassword implements iClientService 
                         .basicAuth(this.username, createPassword())
                         .body("{ \r\n \"action\": \"cliente\", \r\n\"tipo_documento\":" + entry.getKey() + ", \r\n \"nro_documento\": " + number + " \r\n} \r\n")
                         .asJson();
-                
+
                 Gson gson = new Gson();
                 JsonObject jsonObject = gson.fromJson(response.getBody().toString(), JsonObject.class);
                 String errorValue = jsonObject.get("error").getAsString();
-                
-                if(errorValue.equals("0")){
+
+                if (errorValue.equals("0")) {
                     return response;
                 }
 
